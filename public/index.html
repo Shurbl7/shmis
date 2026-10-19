@@ -601,21 +601,21 @@ html[lang="ar"] .mystats span{letter-spacing:0}
 
 #receipt{display:none}
 @media print{body.prc #receipt{display:block}}
-.rc.w58{width:48mm;font-size:11px}.rc.w58 .rhead b{font-size:16px}.rc{width:72mm;margin:0 auto;font:13px/1.45 var(--f-body);color:#000;background:#fff;padding:4mm 0}
+.rc.w58{width:48mm;font-size:11px}.rc.w58 .rhead b{font-size:16px}.rc{width:72mm;margin:0 auto;font:13px/1.45 var(--f-body);color:#000;background:#fff;padding:3mm 0 2mm}
 .rc .rhead{text-align:center;display:flex;flex-direction:column;gap:1px;margin-bottom:6px}.rc .rhead b{font:800 20px var(--f-display);text-transform:uppercase;letter-spacing:.02em}
 .rc .rtitle{text-align:center;font-weight:700;border-top:1px dashed #000;border-bottom:1px dashed #000;padding:4px 0;margin:6px 0}
 .rc .rl{display:flex;justify-content:space-between;gap:8px;padding:2px 0}.rc .rl b{font-weight:600;text-align:end}
 .rc .rsep{border-top:1px dashed #000;margin:6px 0}
 .rc .rtot{font-size:16px}.rc .rtot b{font-weight:800}
 .rc .rfoot{text-align:center;margin-top:10px;border-top:1px dashed #000;padding-top:6px}
-@page{margin:6mm}
+
 
 .brandlogo{width:44px;height:44px;border-radius:50%;flex:none;background:#fff;box-shadow:0 0 0 1px var(--line),var(--shadow);object-fit:cover}
 @media (max-width:560px){.brandlogo{width:36px;height:36px}}
 .biglogo{width:120px;height:120px;border-radius:50%;flex:none;background:#fff;box-shadow:0 0 0 3px var(--brass),0 10px 30px rgba(0,0,0,.25);object-fit:cover;align-self:center}
 @media (max-width:560px){.biglogo{width:92px;height:92px}}
 .plogo{display:block;width:150px;height:150px;margin:0 auto 10px;border-radius:50%}
-.rc .rlogo{width:26mm;height:26mm;margin:0 auto 2mm;filter:grayscale(1) contrast(1.6)}.rc.w58 .rlogo{width:20mm;height:20mm}
+.rc .rlogo{width:34mm;height:auto;margin:0 auto 2mm;display:block}.rc.w58 .rlogo{width:28mm}.rc .rlogo+b{display:none}
 </style>
 </head>
 <body>
@@ -703,7 +703,8 @@ const keyOf=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const parseKey=k=>{const[y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)};
 const addDays=(k,n)=>{const d=parseKey(k);d.setDate(d.getDate()+n);return keyOf(d)};
 const toMin=hm=>{const[h,m]=String(hm||"0:0").split(":").map(Number);return h*60+(m||0)};
-const fmt=m=>`${pad(Math.floor(m/60)%24)}:${pad(m%60)}`;
+const fmt=m=>{const h=Math.floor(m/60)%24,h12=h%12||12;return `${h12}:${pad(m%60)} ${LANG==="ar"?(h<12?"ص":"م"):(h<12?"AM":"PM")}`};
+const fmtS=hm=>fmt(toMin(hm));
 const today=()=>keyOf(new Date());
 const nowMin=()=>{const n=new Date();return n.getHours()*60+n.getMinutes()};
 const STEP=30, DAYS=14;
@@ -906,7 +907,7 @@ function renderStatus(){
   const c=S.cfg,n=nowMin(),closed=isClosedDay(today()),open=!closed&&n>=toMin(c.open)&&n<closeMin();
   $("shopName").textContent=c.shop_name||"Shemis Barber";document.title=(c.shop_name||"Shemis Barber")+" · "+T("Book a chair");
   $("openDot").className="dot"+(open&&!shopPaused()?" on":"");
-  $("openText").textContent=shopPaused()?T("Closed for bookings right now"):open?T("Open now · closes {0}",c.close):closed?T("Closed today"):(n<toMin(c.open)?T("Opens today at {0}",c.open):T("Closed now · opens {0}",c.open));
+  $("openText").textContent=shopPaused()?T("Closed for bookings right now"):open?T("Open now · closes {0}",fmtS(c.close)):closed?T("Closed today"):(n<toMin(c.open)?T("Opens today at {0}",fmtS(c.open)):T("Closed now · opens {0}",fmtS(c.open)));
 }
 
 /* ===== availability ===== */
@@ -1193,7 +1194,7 @@ function nextFreeChair(){
 function weekRows(){
   const c=cfg(),rows=[];
   for(let i=0;i<7;i++){const k=addDays(today(),i),d=parseKey(k).getDay(),closed=(c.closed_days||[]).includes(d),hol=(c.holidays||[]).includes(k);
-    rows.push(`<div class="hrs ${i===0?"now":""}"><span>${i===0?T("Today"):dayName(d,"long")}</span><b>${closed?T("Closed"):hol?T("Closed (holiday)"):`<span dir="ltr">${c.open} – ${c.close}</span>`}</b></div>`)}
+    rows.push(`<div class="hrs ${i===0?"now":""}"><span>${i===0?T("Today"):dayName(d,"long")}</span><b>${closed?T("Closed"):hol?T("Closed (holiday)"):`<span>${fmtS(c.open)} – ${fmtS(c.close)}</span>`}</b></div>`)}
   return rows.join("");
 }
 function offersStrip(){
@@ -1363,7 +1364,7 @@ function renderSched(){
   const T_=slotTimes(),nb=bs.length,ROW=46,o=toMin(cfg().open);
   let h=`<div class="tl" style="grid-template-columns:58px repeat(${nb},minmax(150px,1fr));grid-template-rows:auto repeat(${T_.length},${ROW}px)">`;
   h+=`<div class="hd" style="grid-column:1;grid-row:1"></div>`+bs.map((b,i)=>`<div class="hd" style="grid-column:${i+2};grid-row:1"><span class="av">${esc(initials(b.name))}</span>${esc(b.name)}${barberOff(b.id,S.schedDate)?` <span class="pill">${T("Day off")}</span>`:""}</div>`).join("");
-  T_.forEach((t,r)=>{h+=`<div class="tm" style="grid-column:1;grid-row:${r+2}">${t%60===0?fmt(t):""}</div>`;for(let i=0;i<nb;i++)h+=`<div class="cell ${t%60?"half":""} ${barberOff(bs[i].id,S.schedDate)?"offcell":""}" style="grid-column:${i+2};grid-row:${r+2}"></div>`});
+  T_.forEach((t,r)=>{h+=`<div class="tm" style="grid-column:1;grid-row:${r+2}">${t%60===0?fmt(t).replace(":00",""):""}</div>`;for(let i=0;i<nb;i++)h+=`<div class="cell ${t%60?"half":""} ${barberOff(bs[i].id,S.schedDate)?"offcell":""}" style="grid-column:${i+2};grid-row:${r+2}"></div>`});
   for(const x of rows){const bi=bs.findIndex(b=>b.id===x.barber_id),r=T_.indexOf(x.start_min);if(bi<0||r<0)continue;
     h+=`<button class="blk ${esc(x.status)}" data-bid="${esc(x.id)}" style="grid-column:${bi+2};grid-row:${r+2}/span ${Math.max(1,Math.round(x.minutes/STEP))}"><b>${x.is_home?"🏠 ":""}${esc(x.customer_name)}</b><span>${fmt(x.start_min)} · ${esc(x.service_name)}${x.status!=="confirmed"?" · "+statusLabel(x.status):""}${x.paid_at?" · "+T("Paid"):""}</span></button>`}
   if(S.schedDate===today()){const n=nowMin();if(n>=o&&n<o+T_.length*STEP){const r=Math.floor((n-o)/STEP);h+=`<div class="nowline" style="grid-column:2/${nb+2};grid-row:${r+2};align-self:start;margin-top:${((n-o)%STEP)/STEP*ROW}px"></div>`}}
@@ -1398,7 +1399,7 @@ function renderSheet(){
     ${x.note?`<div class="note">“${esc(x.note)}”</div>`:""}
     ${sheetExtras(x)}
     <div class="payblock">${x.paid_at?
-      `<div class="paydone"><span class="pill completed">${T("Paid")}</span><b>${EGP(x.paid_amount)}</b><span>${x.gift_code?T("Gift card")+" "+esc(x.gift_code):payLabel(x.pay_method)} · ${new Date(x.paid_at).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"})}</span><button class="linkbtn" data-unpay="1">${T("Undo payment")}</button></div>`:
+      `<div class="paydone"><span class="pill completed">${T("Paid")}</span><b>${EGP(x.paid_amount)}</b><span>${x.gift_code?T("Gift card")+" "+esc(x.gift_code):payLabel(x.pay_method)} · ${new Date(x.paid_at).toLocaleTimeString(LOC(),{hour:"numeric",minute:"2-digit",hour12:true})}</span><button class="linkbtn" data-unpay="1">${T("Undo payment")}</button></div>`:
       `<div class="payhead">${T("Payment")}</div>
        <div class="paym" role="radiogroup" aria-label="${T("How did they pay?")}">${PAY.map(([k,l])=>`<button type="button" class="pmeth" data-pm="${k}" aria-pressed="${S.payMethod===k}">${T(l)}</button>`).join("")}</div>
        <div class="acts" style="flex-wrap:nowrap;margin-top:10px"><input id="payAmt" type="number" min="0" inputmode="decimal" value="${esc(S.payAmt??x.price)}" aria-label="${T("Amount paid")}" style="max-width:140px"><span class="sub">${T("EGP")}</span><button class="btn sm" data-pay="1" ${S.payMethod?"":"disabled"}>${T("Mark paid")}</button></div>
@@ -1473,7 +1474,7 @@ function renderDash(){
   if(D.note===null&&S.cfg)D.note=S.cfg.closed_note||"";
   const status=`<div class="card sbox dstatus ${paused?"off":"on"}">
     <div class="dstat-row"><div><div class="eyebrow">${T("Shop status")}</div><div class="dbig">${T(paused?"Closed for bookings":"Open for bookings")}</div>
-      <div style="color:var(--muted);font-size:.88rem">${paused?T("Customers see your message and can't book. You can still add bookings yourself."):T("Customers can book {0}–{1}.",c.open,c.close)}</div></div>
+      <div style="color:var(--muted);font-size:.88rem">${paused?T("Customers see your message and can't book. You can still add bookings yourself."):T("Customers can book {0}–{1}.",fmtS(c.open),fmtS(c.close))}</div></div>
       <button class="switch" id="dToggle" role="switch" aria-checked="${!paused}" aria-label="${T("Taking bookings")}" ${D.saving?"disabled":""}><i></i></button></div>
     <div class="field" style="margin-top:12px"><label for="dNote">${T("Message customers see when closed")}</label>
       <div class="acts" style="flex-wrap:nowrap"><input id="dNote" maxlength="160" value="${esc(D.note)}" placeholder="${T("e.g. Closed for Eid, back on Sunday")}"><button class="btn ghost sm" id="dNoteSave">${T("Save")}</button></div></div></div>`;
@@ -1627,7 +1628,7 @@ const monthLast=m=>{const[y,mo]=m.split("-").map(Number);return keyOf(new Date(y
 const monthTitle=m=>{const[y,mo]=m.split("-").map(Number);return new Date(y,mo-1,1).toLocaleDateString(LOC(),{month:"long",year:"numeric"})};
 const shiftMonth=(m,n)=>{const[y,mo]=m.split("-").map(Number);const d=new Date(y,mo-1+n,1);return `${d.getFullYear()}-${pad(d.getMonth()+1)}`};
 const LATE_GRACE=10;
-const hhmm=iso=>new Date(iso).toLocaleTimeString(LOC(),{hour:"2-digit",minute:"2-digit"});
+const hhmm=iso=>{const d=new Date(iso);return fmt(d.getHours()*60+d.getMinutes())};
 const lateBy=a=>{const d=new Date(a.clock_in),v=d.getHours()*60+d.getMinutes()-toMin(cfg().open);return v>LATE_GRACE?v:0};
 const attMins=a=>{const end=a.clock_out?new Date(a.clock_out):a.day===today()?new Date():null;return end?Math.max(0,Math.round((end-new Date(a.clock_in))/60000)):0};
 const hrs=m=>T("{0}h {1}m",Math.floor(m/60),pad(m%60));
@@ -2049,12 +2050,12 @@ document.addEventListener("click",async e=>{const C=S.cust;if(!C)return;
 });
 
 /* ===== printable receipt ===== */
-function printReceipt(b){
+async function printReceipt(b){
   if(!b)return;const c=cfg(),line=(l,v,cls="")=>`<div class="rl ${cls}"><span>${l}</span><b>${v}</b></div>`;
   const base=Number(b.base_price??b.price),fee=Number(b.home_fee||0),pts=Number(b.points_discount||0),disc=Math.max(0,Math.round((base-fee-(Number(b.price)+pts-fee))*100)/100);
   const now=new Date();
   $("receipt").innerHTML=`<div class="rc ${prSet().w==="58"?"w58":""}">
-    <div class="rhead"><img class="rlogo" src="logo.png" alt=""><b>${esc(c.shop_name||"Shemis Barber")}</b>${c.address?`<span dir="auto">${esc(c.address)}</span>`:""}${c.phone?`<span dir="ltr">${esc(c.phone)}</span>`:""}</div>
+    <div class="rhead"><img class="rlogo" src="logo-print.png" alt=""><b>${esc(c.shop_name||"Shemis Barber")}</b>${c.address?`<span dir="auto">${esc(c.address)}</span>`:""}${c.phone?`<span dir="ltr">${esc(c.phone)}</span>`:""}</div>
     <div class="rtitle">${T("Receipt")} · #${esc(String(b.id).slice(0,6).toUpperCase())}</div>
     ${line(T("Date"),esc(parseKey(b.day).toLocaleDateString(LOC(),{weekday:"short",day:"numeric",month:"short",year:"numeric"}))+" · "+fmt(b.start_min))}
     ${line(T("Customer"),esc(b.customer_name))}
@@ -2068,8 +2069,13 @@ function printReceipt(b){
     ${line(T("Total"),EGP(b.price),"rtot")}
     ${b.paid_at?line(T("Paid")+" · "+(b.gift_code?T("Gift card"):payLabel(b.pay_method)),EGP(b.paid_amount)):line(T("Status"),T("Not paid yet"))}
     <div class="rfoot">${T("Thank you! See you next time.")}<br><span dir="ltr">${esc(location.host)}</span><br><small>${esc(now.toLocaleString(LOC()))}</small></div></div>`;
+  const R=$("receipt");R.style.cssText="display:block;position:absolute;left:-9999px;top:0";
+  const im=R.querySelector("img");if(im&&!im.complete)await new Promise(r=>{im.onload=im.onerror=r;setTimeout(r,2000)});
+  const mm=Math.ceil(R.querySelector(".rc").getBoundingClientRect().height*25.4/96)+10;R.style.cssText="";
+  let pg=$("pgsize");if(!pg){pg=document.createElement("style");pg.id="pgsize";document.head.appendChild(pg)}
+  pg.textContent=`@page{size:${prSet().w==="58"?58:80}mm ${mm}mm;margin:0}`;
   document.body.classList.add("prc");
-  const off=()=>{document.body.classList.remove("prc");window.removeEventListener("afterprint",off)};window.addEventListener("afterprint",off);
+  const off=()=>{document.body.classList.remove("prc");pg.textContent="";window.removeEventListener("afterprint",off)};window.addEventListener("afterprint",off);
   setTimeout(()=>{window.print();setTimeout(off,1500)},50);
 }
 document.body.insertAdjacentHTML("beforeend",'<div id="receipt"></div>');
