@@ -1,6 +1,6 @@
-// Shims Barbershop: keeps the app shell available, always tries the network first so updates show up.
-const CACHE = "shims-v2";
-const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
+// Shemis Barber: keeps the app shell available, always tries the network first so updates show up.
+const CACHE = "shims-v3";
+const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "logo.png", "logo-128.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {})); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))); self.clients.claim(); });
 self.addEventListener("fetch", e => {
@@ -10,8 +10,8 @@ self.addEventListener("fetch", e => {
     .catch(() => caches.match(req).then(r => r || caches.match("index.html"))));
 });
 self.addEventListener("push", e => {
-  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (_) { d = { title: "Shims Barbershop", body: e.data ? e.data.text() : "" }; }
-  e.waitUntil(self.registration.showNotification(d.title || "Shims Barbershop", { body: d.body || "", icon: "icon-192.png", badge: "icon-192.png", data: { url: d.url || "./" }, tag: d.tag || undefined }));
+  let d = {}; try { d = e.data ? e.data.json() : {}; } catch (_) { d = { title: "Shemis Barber", body: e.data ? e.data.text() : "" }; }
+  e.waitUntil(self.registration.showNotification(d.title || "Shemis Barber", { body: d.body || "", icon: "icon-192.png", badge: "icon-192.png", data: { url: d.url || "./" }, tag: d.tag || undefined }));
 });
 self.addEventListener("notificationclick", e => {
   e.notification.close();

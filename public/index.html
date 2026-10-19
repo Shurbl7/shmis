@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1E5B47">
-<title>Shims Barbershop · Book a chair</title>
+<title>Shemis Barber · Book a chair</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon-192.png">
+<link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Shims">
+<meta name="apple-mobile-web-app-title" content="Shemis Barber">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Cairo:wght@400;600;700;800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
 <style>
-/* Shims Barbershop booking app. Palette: barber-chair green leather, brass fittings, tiled off-white. */
+/* Shemis Barber booking app. Palette: barber-chair green leather, brass fittings, tiled off-white. */
 :root{
   --bg:#F1F4F1; --surface:#FFFFFF; --surface-2:#E7ECE8; --ink:#13201B; --muted:#5A6A63; --line:#D5DDD8;
   --accent:#1E5B47; --accent-ink:#FFFFFF; --accent-soft:#DDEBE4; --brass:#8E6A22; --brass-soft:#F2E8D1;
@@ -609,15 +609,22 @@ html[lang="ar"] .mystats span{letter-spacing:0}
 .rc .rtot{font-size:16px}.rc .rtot b{font-weight:800}
 .rc .rfoot{text-align:center;margin-top:10px;border-top:1px dashed #000;padding-top:6px}
 @page{margin:6mm}
+
+.brandlogo{width:44px;height:44px;border-radius:50%;flex:none;background:#fff;box-shadow:0 0 0 1px var(--line),var(--shadow);object-fit:cover}
+@media (max-width:560px){.brandlogo{width:36px;height:36px}}
+.biglogo{width:120px;height:120px;border-radius:50%;flex:none;background:#fff;box-shadow:0 0 0 3px var(--brass),0 10px 30px rgba(0,0,0,.25);object-fit:cover;align-self:center}
+@media (max-width:560px){.biglogo{width:92px;height:92px}}
+.plogo{display:block;width:150px;height:150px;margin:0 auto 10px;border-radius:50%}
+.rc .rlogo{width:26mm;height:26mm;margin:0 auto 2mm;filter:grayscale(1) contrast(1.6)}.rc.w58 .rlogo{width:20mm;height:20mm}
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
     <div class="brand">
-      <div class="pole" aria-hidden="true"></div>
+      <img class="brandlogo" src="logo-128.png" alt="" width="44" height="44">
       <div>
-        <h1 id="shopName">Shims Barbershop</h1>
+        <h1 id="shopName">Shemis Barber</h1>
         <div class="status"><span class="dot" id="openDot"></span><span id="openText">…</span></div>
       </div>
       <button class="langbtn" id="langBtn" type="button"></button>
@@ -886,7 +893,7 @@ async function loadConfig(){
   S.cfg={...s.data,open:s.data.open_time.slice(0,5),close:s.data.close_time.slice(0,5),barbers:b.data,services:v.data,off:o.data||[]};
   S.loadErr=false;S.loaded=true;renderAll();loadPublicExtras();
 }
-const cfg=()=>S.cfg||{shop_name:"Shims Barbershop",open:"12:00",close:"23:00",closed_days:[],holidays:[],barbers:[],services:[],off:[],noshow_limit:3};
+const cfg=()=>S.cfg||{shop_name:"Shemis Barber",open:"12:00",close:"23:00",closed_days:[],holidays:[],barbers:[],services:[],off:[],noshow_limit:3};
 const activeBarbers=()=>cfg().barbers.filter(b=>b.active);
 const activeServices=()=>cfg().services.filter(s=>s.active);
 const barberOff=(bid,k)=>cfg().off.some(o=>o.barber_id===bid&&o.day===k);
@@ -897,7 +904,7 @@ const shopPaused=()=>!!S.cfg&&S.cfg.is_open===false;
 function renderStatus(){
   if(!S.cfg){$("openText").textContent=T(S.loadErr?"Can't reach the booking system":"Loading hours…");return}
   const c=S.cfg,n=nowMin(),closed=isClosedDay(today()),open=!closed&&n>=toMin(c.open)&&n<closeMin();
-  $("shopName").textContent=c.shop_name||"Shims Barbershop";document.title=(c.shop_name||"Shims Barbershop")+" · "+T("Book a chair");
+  $("shopName").textContent=c.shop_name||"Shemis Barber";document.title=(c.shop_name||"Shemis Barber")+" · "+T("Book a chair");
   $("openDot").className="dot"+(open&&!shopPaused()?" on":"");
   $("openText").textContent=shopPaused()?T("Closed for bookings right now"):open?T("Open now · closes {0}",c.close):closed?T("Closed today"):(n<toMin(c.open)?T("Opens today at {0}",c.open):T("Closed now · opens {0}",c.open));
 }
@@ -1213,7 +1220,7 @@ function renderPoster(){
   const url=location.origin+location.pathname,c=cfg();let svg="";
   try{const q=qrcode(0,"M");q.addData(url);q.make();svg=q.createSvgTag({cellSize:8,margin:2,scalable:true})}catch(e){svg=`<p>${T("Can't draw the QR code. Check your connection and try again.")}</p>`}
   el.innerHTML=`<div class="posterwrap"><div class="ptools"><button class="btn" data-pprint="1">${T("Print")}</button><button class="btn ghost" data-pclose="1">${T("Close")}</button><span class="sub">${T("Print it, or take a screenshot for Instagram.")}</span></div>
-    <div class="psheet"><div class="ppole"></div><h2>${esc(c.shop_name||"Shims Barbershop")}</h2><p class="pbig">${LANG==="ar"?"امسح الكود واحجز":"Scan to book your chair"}</p><p class="psmall">${LANG==="ar"?"Scan to book your chair":"امسح الكود واحجز"}</p>
+    <div class="psheet"><div class="ppole"></div><img class="plogo" src="logo.png" alt=""><h2>${esc(c.shop_name||"Shemis Barber")}</h2><p class="pbig">${LANG==="ar"?"امسح الكود واحجز":"Scan to book your chair"}</p><p class="psmall">${LANG==="ar"?"Scan to book your chair":"امسح الكود واحجز"}</p>
     <div class="pqr">${svg}</div><p class="purl" dir="ltr">${esc(url.replace(/^https?:\/\//,"").replace(/\/$/,""))}</p>
     <p class="pfoot">${T("Book online any time, day or night.")}${c.phone?` · <span dir="ltr">${esc(c.phone)}</span>`:""}</p></div></div>`;
 }
@@ -1229,13 +1236,13 @@ function renderHome(){
   <section class="hero">
     <div class="hero-copy">
       <div class="chip ${openNow?"on":""}"><span class="dot ${openNow?"on":""}"></span>${esc($("openText").textContent)}</div>
-      <h2 class="hero-title">${esc(c.shop_name||"Shims Barbershop")}</h2>
+      <h2 class="hero-title">${esc(c.shop_name||"Shemis Barber")}</h2>
       <p class="hero-tag">${esc(c.tagline||T("Sharp cuts, booked in under a minute."))}</p>
       <div class="acts hero-cta"><button class="btn big" data-go-book="1">${T("Book a chair")}</button><button class="btn ghost big" data-scroll="prices">${T("See prices")}</button></div>
       ${paused?`<div class="notice" style="margin-top:16px">${ICON.info}<div>${esc(c.closed_note||T("We're not taking bookings right now"))}</div></div>`:""}
     </div>
     <div class="hero-side">
-      <div class="bigpole" aria-hidden="true"><i></i></div>
+      <img class="biglogo" src="logo.png" alt="" width="120" height="120">
       <div class="hero-card">
         <div class="hc-row"><span>${T("Next free chair")}</span><b>${nf?`${esc(nice(nf.k))} · ${fmt(nf.t)}`:"–"}</b></div>
         <div class="hc-row"><span>${T("Prices from")}</span><b>${from!=null?EGP(from):"–"}</b></div>
@@ -1276,7 +1283,7 @@ function renderHome(){
     <div class="gcheck"><label for="gcIn">${T("Have a gift card? Check the balance")}</label><div class="acts" style="flex-wrap:nowrap"><input id="gcIn" dir="ltr" maxlength="12" placeholder="ABCD2345" style="text-transform:uppercase"><button class="btn ghost" data-gccheck="1">${T("Check")}</button></div>
     ${S.gcCheck?`<div class="${S.gcCheck.ok?"okline":"err"}" style="margin-top:6px">${S.gcCheck.ok?(S.gcCheck.expired?T("This gift card has expired."):T("Balance: {0}",EGP(S.gcCheck.balance))+(S.gcCheck.expires_on?" · "+T("until {0}",esc(dshort(S.gcCheck.expires_on))):"")):T("We couldn't find that gift card. Check the code and try again.")}</div>`:""}</div></section>
   <section class="ctaband"><div><h3>${T("Ready for a fresh cut?")}</h3><p>${T("Pick a time that suits you. It takes under a minute.")}</p></div><button class="btn big" data-go-book="1">${T("Book a chair")}</button></section>
-  <footer class="foot"><span>© ${new Date().getFullYear()} ${esc(c.shop_name||"Shims Barbershop")}</span><button class="linkbtn" data-go-acc="1">${T(S.session?"My account":"Sign in")}</button></footer>`;
+  <footer class="foot"><span>© ${new Date().getFullYear()} ${esc(c.shop_name||"Shemis Barber")}</span><button class="linkbtn" data-go-acc="1">${T(S.session?"My account":"Sign in")}</button></footer>`;
 }
 $("home").addEventListener("click",async e=>{
   const lb=e.target.closest("[data-lb]");if(lb){S.lightbox=Number(lb.dataset.lb);renderLightbox();return}
@@ -2047,7 +2054,7 @@ function printReceipt(b){
   const base=Number(b.base_price??b.price),fee=Number(b.home_fee||0),pts=Number(b.points_discount||0),disc=Math.max(0,Math.round((base-fee-(Number(b.price)+pts-fee))*100)/100);
   const now=new Date();
   $("receipt").innerHTML=`<div class="rc ${prSet().w==="58"?"w58":""}">
-    <div class="rhead"><b>${esc(c.shop_name||"Shims Barbershop")}</b>${c.address?`<span dir="auto">${esc(c.address)}</span>`:""}${c.phone?`<span dir="ltr">${esc(c.phone)}</span>`:""}</div>
+    <div class="rhead"><img class="rlogo" src="logo.png" alt=""><b>${esc(c.shop_name||"Shemis Barber")}</b>${c.address?`<span dir="auto">${esc(c.address)}</span>`:""}${c.phone?`<span dir="ltr">${esc(c.phone)}</span>`:""}</div>
     <div class="rtitle">${T("Receipt")} · #${esc(String(b.id).slice(0,6).toUpperCase())}</div>
     ${line(T("Date"),esc(parseKey(b.day).toLocaleDateString(LOC(),{weekday:"short",day:"numeric",month:"short",year:"numeric"}))+" · "+fmt(b.start_min))}
     ${line(T("Customer"),esc(b.customer_name))}

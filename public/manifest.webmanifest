@@ -1,7 +1,7 @@
 {
-  "name": "Shims Barbershop",
-  "short_name": "Shims",
-  "description": "Book a chair at Shims Barbershop",
+  "name": "Shemis Barber",
+  "short_name": "Shemis",
+  "description": "Book a chair at Shemis Barber",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
