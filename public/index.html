@@ -601,7 +601,7 @@ html[lang="ar"] .mystats span{letter-spacing:0}
 
 #receipt{display:none}
 @media print{body.prc #receipt{display:block}}
-.rc.w58{width:48mm;font-size:11px}.rc.w58 .rhead b{font-size:16px}.rc{width:72mm;margin:0 auto;font:13px/1.45 var(--f-body);color:#000;background:#fff;padding:3mm 0 2mm}
+.rc.w58{width:45mm;font-size:10.5px}.rc.w58 .rhead b{font-size:16px}.rc{width:68mm;margin:0 auto;font:12.5px/1.4 var(--f-body);color:#000;background:#fff;padding:1mm 0 1mm}
 .rc .rhead{text-align:center;display:flex;flex-direction:column;gap:1px;margin-bottom:6px}.rc .rhead b{font:800 20px var(--f-display);text-transform:uppercase;letter-spacing:.02em}
 .rc .rtitle{text-align:center;font-weight:700;border-top:1px dashed #000;border-bottom:1px dashed #000;padding:4px 0;margin:6px 0}
 .rc .rl{display:flex;justify-content:space-between;gap:8px;padding:2px 0}.rc .rl b{font-weight:600;text-align:end}
@@ -2073,7 +2073,7 @@ async function printReceipt(b){
   const im=R.querySelector("img");if(im&&!im.complete)await new Promise(r=>{im.onload=im.onerror=r;setTimeout(r,2000)});
   const mm=Math.ceil(R.querySelector(".rc").getBoundingClientRect().height*25.4/96)+10;R.style.cssText="";
   let pg=$("pgsize");if(!pg){pg=document.createElement("style");pg.id="pgsize";document.head.appendChild(pg)}
-  pg.textContent=`@page{size:${prSet().w==="58"?58:80}mm ${mm}mm;margin:0}`;
+  pg.textContent=`@page{size:${prSet().w==="58"?48:72}mm ${mm}mm;margin:0}`;
   document.body.classList.add("prc");
   const off=()=>{document.body.classList.remove("prc");pg.textContent="";window.removeEventListener("afterprint",off)};window.addEventListener("afterprint",off);
   setTimeout(()=>{window.print();setTimeout(off,1500)},50);
