@@ -917,7 +917,7 @@ async function loadPublicExtras(){
   if(S.tab==="home")renderHome();if(S.tab==="settings")renderSettings(false);if(S.tab==="dash")renderDash();if(S.tab==="mine")renderMine();
 }
 async function loadConfig(){
-  const [s,b,v,o]=await Promise.all([sb.from("settings").select("*").eq("id",1).maybeSingle(),sb.from("barbers").select("*").order("sort").order("name"),sb.from("services").select("*").order("sort").order("name"),sb.from("barber_days_off").select("*").gte("day",addDays(today(),-62))]);
+  const [s,b,v,o]=await Promise.all([sb.from("settings").select("*").eq("id",1).maybeSingle(),sb.rpc("barbers_list"),sb.from("services").select("*").order("sort").order("name"),sb.from("barber_days_off").select("*").gte("day",addDays(today(),-62))]);
   if(s.error||b.error||v.error||!s.data){S.loadErr=true;S.loaded=true;renderAll();return}
   S.cfg={...s.data,open:s.data.open_time.slice(0,5),close:s.data.close_time.slice(0,5),barbers:b.data,services:v.data,off:o.data||[]};
   S.loadErr=false;S.loaded=true;renderAll();loadPublicExtras();
